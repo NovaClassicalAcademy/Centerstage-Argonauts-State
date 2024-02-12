@@ -3,51 +3,65 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class PixelLifter {
+public class PixelLifterB {
 
-    int mFloorPos = 0;
-    int mHoverPos = 0;
+    int POSITION_FLOOR = 0;
+    int POSITION_HOVER = 155;
+    int POSITION_CARRY = 588;
+    int POSITION_DUMP = 1639;
+    double INTAKE_ACQUIRE_SPEED = .8;
+    double INTAKE_REJECT_SPEED = -.4;
 
-    int mMidPos = 0;
-    int mDumpPos = 0;
-    int mFarBackPos = 0;
+    enum POSITION{
+        FLOOR,
+        HOVER,
+        CARRY,
+        DUMP
+    }
 
     double mPowerLimit = .1;
     DcMotor mLiftMotor;
+    DcMotor mIntakeSpinner;
 
-    public PixelLifter(DcMotor liftMotor,
-                            int floorPos,
-                            int hoverPos,
-                            int dumpPos,
-                            int farBackPos,
-                            double powerLimit){
+    public PixelLifterB(DcMotor liftMotor,
+                        DcMotor intakeSpinner,
+                        double powerLimit){
 
         mLiftMotor = liftMotor;
-        mFloorPos = floorPos;
-        mHoverPos = hoverPos;
-        mDumpPos = dumpPos;
-        mFarBackPos = farBackPos;
+        mIntakeSpinner = intakeSpinner;
         mPowerLimit = powerLimit;
 
     }
 
     public void moveToFloor(){
-            goToTarget(mLiftMotor, mFloorPos,mPowerLimit);
+            goToTarget(mLiftMotor, POSITION_FLOOR,mPowerLimit);
     }
 
     public void moveToHover(){
-        goToTarget(mLiftMotor, mHoverPos,mPowerLimit);
+        goToTarget(mLiftMotor, POSITION_HOVER,mPowerLimit);
 
     }
-
-
 
     public void dumpPixel(){
-        goToTarget(mLiftMotor, mDumpPos,mPowerLimit);
+        goToTarget(mLiftMotor, POSITION_DUMP,mPowerLimit);
     }
 
-    public void moveFarBack(){
-        goToTarget(mLiftMotor, mFarBackPos,mPowerLimit);
+    public void moveCarry(){
+        goToTarget(mLiftMotor, POSITION_CARRY,mPowerLimit);
+    }
+
+    public int getLifterCurrentPosition (){
+        return mLiftMotor.getCurrentPosition();
+    }
+
+    public void acquirePixel(){
+        //spin intake to suck in a pixel
+        mIntakeSpinner.setPower(INTAKE_ACQUIRE_SPEED);
+    }
+
+    public void rejectPixel(){
+        //spin intake to spit out a pixel
+        mIntakeSpinner.setPower(INTAKE_REJECT_SPEED);
     }
 
     public void goToTarget(DcMotor motor,int targetPos,double powLimit){
