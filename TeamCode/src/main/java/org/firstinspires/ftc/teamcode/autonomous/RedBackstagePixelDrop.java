@@ -210,9 +210,9 @@ public class RedBackstagePixelDrop extends LinearOpMode {
       //Rotate counterclockewise 90
        turnToHeading( TURN_SPEED, 90.0);
           // Stop 4 secs
-        sleep(4000);
+        //sleep(4000);
           //Drive toward back drop
-       driveStraight(DRIVE_SPEED, -45.0, 90.0);
+       driveStraight(DRIVE_SPEED, -37.5, 90.0);
           //Drop pixel onto back drop
         pixLift.dumpPixel();
           //slip left to park( how do i go left?)

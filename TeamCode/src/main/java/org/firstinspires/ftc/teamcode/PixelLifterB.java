@@ -8,7 +8,7 @@ public class PixelLifterB {
     int POSITION_FLOOR = 0;
     int POSITION_HOVER = 155;
     int POSITION_CARRY = 588;
-    int POSITION_DUMP = 1639;
+    int POSITION_DUMP = 1500;//was 1639
     double INTAKE_ACQUIRE_SPEED = .8;
     double INTAKE_REJECT_SPEED = -.4;
 
@@ -19,7 +19,7 @@ public class PixelLifterB {
         DUMP
     }
 
-    double mPowerLimit = .1;
+    double mPowerLimit = .9;
     DcMotor mLiftMotor;
     DcMotor mIntakeSpinner;
 
@@ -44,6 +44,9 @@ public class PixelLifterB {
 
     public void dumpPixel(){
         moveLifter(mLiftMotor, POSITION_DUMP,mPowerLimit);
+        while(mLiftMotor.getCurrentPosition()<POSITION_DUMP){
+            mLiftMotor.setPower(-.5);
+        }
     }
 
     public void moveCarry(){
@@ -77,9 +80,9 @@ D: if you’re quickly getting close to where you want to be, slow down.
 
          */
 //PID constants
-        double Kp = .2;
+        double Kp = .5;
         double Ki = .1;
-        double Kd = .5;
+        double Kd = .2;
 
         double reference = targetPos;
         double lastReference = reference;
@@ -87,7 +90,7 @@ D: if you’re quickly getting close to where you want to be, slow down.
 
         double lastError = 0;
 
-        double maxIntegralSum = .5;
+        double maxIntegralSum = powLimit;
 
         double a = 0.8; // a can be anything from 0 < a < 1
         double previousFilterEstimate = 0;
