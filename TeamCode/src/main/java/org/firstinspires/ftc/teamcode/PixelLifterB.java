@@ -13,8 +13,8 @@ public class PixelLifterB {
     int POSITION_HOVER = 155;
     int POSITION_CARRY = 588;
     int POSITION_DUMP = 1600;//was 1639
-    double INTAKE_ACQUIRE_SPEED = .8;
-    double INTAKE_REJECT_SPEED = -.4;
+    double INTAKE_ACQUIRE_SPEED = -.8;
+    double INTAKE_REJECT_SPEED = .4;
 
     enum POSITION {
         FLOOR,
@@ -75,6 +75,12 @@ public class PixelLifterB {
         mIntakeSpinner.setPower(INTAKE_REJECT_SPEED);
     }
 
+    public void rejectOnePixel(double durationSeconds){
+        ElapsedTime spinTimer = new ElapsedTime();
+        while (spinTimer.time() < durationSeconds){
+            mIntakeSpinner.setPower(INTAKE_REJECT_SPEED);
+        }
+    }
 
     public void goToTarget(DcMotorEx motor,int targetPos,double velocity) {
         motor.setTargetPosition(targetPos);

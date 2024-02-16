@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -140,7 +141,7 @@ public class RedBackstagePixelDrop extends LinearOpMode {
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable
 
     DcMotor intakeMotor = null;
-    DcMotor lifterMotor = null;
+    DcMotorEx lifterMotor = null;
 
     PixelLifterB pixLift = null;
     @Override
@@ -152,7 +153,8 @@ public class RedBackstagePixelDrop extends LinearOpMode {
         frontRightMotor = hardwareMap.get(DcMotor.class, "fr");
         backRightMotor = hardwareMap.get(DcMotor.class, "br");
         intakeMotor = hardwareMap.dcMotor.get("intake_motor");          //pixel intake
-        lifterMotor = hardwareMap.dcMotor.get("lifter");  //pixel lifter
+        //lifterMotor = hardwareMap.dcMotor.get("lifter");  //pixel lifter
+        lifterMotor = hardwareMap.get(DcMotorEx.class, "lifter");
         pixLift = new PixelLifterB(lifterMotor,intakeMotor,.3);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -204,7 +206,8 @@ public class RedBackstagePixelDrop extends LinearOpMode {
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
          //*** RAISED DRIVE SPEED UP TO 0.8 AND TURN SPEED TO 0.4
-        
+        pixLift.moveToHover();
+        sleep(1000);
         driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
         //commenting out to see why bot is swerving
       //Rotate counterclockewise 90
@@ -215,6 +218,10 @@ public class RedBackstagePixelDrop extends LinearOpMode {
        driveStraight(DRIVE_SPEED, -37.5, 90.0);
           //Drop pixel onto back drop
         pixLift.dumpPixel();
+        sleep(3000);
+        pixLift.moveToFloor();
+        //sleep(3000);
+        //pixLift.rejectOnePixel(1);
           //slip left to park( how do i go left?)
         // driveStraight(DRIVE_SPEED, 16.0, 180.0);
           //back into park
