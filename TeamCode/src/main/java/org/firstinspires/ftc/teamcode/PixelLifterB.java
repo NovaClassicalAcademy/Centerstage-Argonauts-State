@@ -1,18 +1,22 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PixelLifterB {
 
     int POSITION_FLOOR = 0;
     int POSITION_HOVER = 155;
     int POSITION_CARRY = 588;
-    int POSITION_DUMP = 1500;//was 1639
+    int POSITION_DUMP = 1600;//was 1639
     double INTAKE_ACQUIRE_SPEED = .8;
     double INTAKE_REJECT_SPEED = -.4;
 
-    enum POSITION{
+    enum POSITION {
         FLOOR,
         HOVER,
         CARRY,
@@ -20,137 +24,64 @@ public class PixelLifterB {
     }
 
     double mPowerLimit = .9;
-    DcMotor mLiftMotor;
+    DcMotorEx mLiftMotor;
     DcMotor mIntakeSpinner;
 
-    public PixelLifterB(DcMotor liftMotor,
+    public PixelLifterB(DcMotorEx liftMotor,
                         DcMotor intakeSpinner,
-                        double powerLimit){
+                        double powerLimit) {
 
         mLiftMotor = liftMotor;
         mIntakeSpinner = intakeSpinner;
         mPowerLimit = powerLimit;
+        mLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        mLiftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 
-    public void moveToFloor(){
-            goToTarget(mLiftMotor, POSITION_FLOOR,mPowerLimit);
-    }
-
-    public void moveToHover(){
-        goToTarget(mLiftMotor, POSITION_HOVER,mPowerLimit);
+    public void moveToFloor() {
+        goToTarget(mLiftMotor, POSITION_FLOOR, 700);
 
     }
 
-    public void dumpPixel(){
-        moveLifter(mLiftMotor, POSITION_DUMP,mPowerLimit);
-        while(mLiftMotor.getCurrentPosition()<POSITION_DUMP){
-            mLiftMotor.setPower(-.5);
-        }
+    public void moveToHover() {
+        goToTarget(mLiftMotor, POSITION_HOVER, 700);
+
     }
 
-    public void moveCarry(){
-        goToTarget(mLiftMotor, POSITION_CARRY,mPowerLimit);
+    public void dumpPixel() {
+        goToTarget(mLiftMotor, POSITION_DUMP, 1200);
     }
 
-    public int getLifterCurrentPosition (){
+    public void moveCarry() {
+        goToTarget(mLiftMotor, POSITION_CARRY, 600);
+    }
+
+    public void resetEncoder(){
+        mLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public int getLifterCurrentPosition() {
         return mLiftMotor.getCurrentPosition();
     }
 
-    public void acquirePixel(){
+    public void acquirePixel() {
         //spin intake to suck in a pixel
         mIntakeSpinner.setPower(INTAKE_ACQUIRE_SPEED);
     }
 
-    public void rejectPixel(){
+    public void rejectPixel() {
         //spin intake to spit out a pixel
         mIntakeSpinner.setPower(INTAKE_REJECT_SPEED);
     }
 
-    public void goToTarget(DcMotor motor,int targetPos,double powLimit) {
-        /*
 
-         * Proportional Integral Derivative Controller w/ Low pass filter and anti-windup
-ADAPTED FROM: https://www.ctrlaltftc.com/the-pid-controller/practical-improvements-to-pid
-Also: P: the further you are from where you want to be, the harder you should try to get there.
-
-I: the longer you haven’t been where you want to be, the harder you should try to get there.
-
-D: if you’re quickly getting close to where you want to be, slow down.
-
-         */
-//PID constants
-        double Kp = .5;
-        double Ki = .1;
-        double Kd = .2;
-
-        double reference = targetPos;
-        double lastReference = reference;
-        double integralSum = 0;
-
-        double lastError = 0;
-
-        double maxIntegralSum = powLimit;
-
-        double a = 0.8; // a can be anything from 0 < a < 1
-        double previousFilterEstimate = 0;
-        double currentFilterEstimate = 0;
-        double out = 0;
-        double error = 0;
-        double errorChange = 0;
-        double derivative = 0;
-        double encoderPosition = motor.getCurrentPosition();
-
-// Elapsed timer class from SDK, please use it, it's epic
-        ElapsedTime timer = new ElapsedTime();
-        encoderPosition = motor.getCurrentPosition();
-
-        while (encoderPosition != targetPos) {
-            // obtain the encoder position
-            encoderPosition = motor.getCurrentPosition();
-            // calculate the error
-            error = reference - encoderPosition;
-
-            errorChange = (error - lastError);
-
-            // filter out high frequency noise to increase derivative performance
-            currentFilterEstimate = (a * previousFilterEstimate) + (1 - a) * errorChange;
-            previousFilterEstimate = currentFilterEstimate;
-
-            // rate of change of the error
-            derivative = currentFilterEstimate / timer.seconds();
-
-            // sum of all error over time
-            integralSum = integralSum + (error * timer.seconds());
-
-
-            // max out integral sum
-            if (integralSum > maxIntegralSum) {
-                integralSum = maxIntegralSum;
-            }
-
-            if (integralSum < -maxIntegralSum) {
-                integralSum = -maxIntegralSum;
-            }
-
-            // reset integral sum upon setpoint changes
-            if (reference != lastReference) {
-                integralSum = 0;
-            }
-
-            out = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
-            out = out * powLimit;
-            motor.setPower(out);
-
-            lastError = error;
-
-            lastReference = reference;
-
-            // reset the timer for next time
-            timer.reset();
-
-        }
+    public void goToTarget(DcMotorEx motor,int targetPos,double velocity) {
+        motor.setTargetPosition(targetPos);
+        motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        motor.setVelocity(velocity);
     }
+
         public void moveLifter(DcMotor liftMotor,int targetPos,double powLimit){
 
             double Kp = .4;//proportional
