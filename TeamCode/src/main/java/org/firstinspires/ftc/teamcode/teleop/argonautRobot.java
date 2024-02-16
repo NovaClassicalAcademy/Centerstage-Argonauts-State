@@ -116,7 +116,7 @@ public class argonautRobot extends LinearOpMode {
             boolean droneFailSafe = gamepad2.right_bumper;
 
             //Configurations
-            float intakeMotorPower = 1f;
+            float intakeMotorPower = 0.8f;      //1f;
             float raiseRobotPower = 1f;
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             double secondLiftDesignBoost = 1.15;     //for original design it is 1

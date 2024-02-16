@@ -47,6 +47,8 @@ public class autoTeleopPixelRed extends LinearOpMode {
         //turnRobot(0.5);
         //turnRobot(-0.5);
 
+        telemetry.update();
+
     }
 
     private void driveRobot(int distance, double leftStickY, double leftStickX) {

@@ -62,8 +62,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto Backup to Corner")
-public class AutoBackToCorner extends LinearOpMode {
+@Autonomous(name="Auto Pause Back to Corner")
+public class AutoPauseBackToCorner extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor         frontLeftMotor   = null;
@@ -82,8 +82,8 @@ public class AutoBackToCorner extends LinearOpMode {
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
     //static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // Neverest 40 motor (old motor - first competition)
     static final double     COUNTS_PER_MOTOR_REV    = 751.9;    // possible new motor spec (actual was 751.8)
-                                                                // 752 ... 48 inches was 48.5 inches driven
-                                                                // 751.8 ... 48 inches was 47 inches driven
+    // 752 ... 48 inches was 48.5 inches driven
+    // 751.8 ... 48 inches was 47 inches driven
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
 
     //Gear Ratio ... 26.9:1
@@ -91,7 +91,7 @@ public class AutoBackToCorner extends LinearOpMode {
     //measuring with the calipers, it looked like wheel diameter might be 3.805 (but it might be human error in my measurement)
     static final double     WHEEL_DIAMETER_INCHES   = 3.8582;     //  TETRIX Mechanum For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
+            (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.4;
     static final double     TURN_SPEED              = 0.5;
 
@@ -134,6 +134,8 @@ public class AutoBackToCorner extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
+
+        sleep(23000);       //pause for 23 seconds
 
         //LOGAN NOTE: the 48 inches noted here is actually driving 70.5 inches
         encoderDrive(DRIVE_SPEED,  -48,  -48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
@@ -200,9 +202,9 @@ public class AutoBackToCorner extends LinearOpMode {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                   (runtime.seconds() < timeoutS) &&
-                   (frontLeftMotor.isBusy() && backLeftMotor.isBusy()
-                   && frontRightMotor.isBusy() && backRightMotor.isBusy())) {
+                    (runtime.seconds() < timeoutS) &&
+                    (frontLeftMotor.isBusy() && backLeftMotor.isBusy()
+                            && frontRightMotor.isBusy() && backRightMotor.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Running to",  " %7d :%7d", newLeftFrontTarget,  newRightFrontTarget);

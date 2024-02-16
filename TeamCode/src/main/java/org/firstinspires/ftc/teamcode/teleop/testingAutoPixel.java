@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,17 +11,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@Config
 @TeleOp(name = "TestingAuto")
 public class testingAutoPixel extends LinearOpMode {
 
     //These are the distances for each auto step
-    IMU imu = hardwareMap.get(IMU.class, "imu");
+    //IMU imu = hardwareMap.get(IMU.class, "imu");
     // Adjust the orientation parameters to match your robot
-    IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-            RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-            RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+    //IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+    //        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+    //        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
     // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
     //imu.initialize(parameters);
     //Field-centric initialization - end
@@ -31,53 +36,74 @@ public class testingAutoPixel extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+        //Define variables to robot components
+        DcMotor frontLeft = hardwareMap.dcMotor.get("fl");
+        DcMotor backLeft = hardwareMap.dcMotor.get("bl");
+        DcMotor frontRight = hardwareMap.dcMotor.get("fr");
+        DcMotor backRight = hardwareMap.dcMotor.get("br");
+
+        DcMotor lifterMotor = hardwareMap.dcMotor.get("lifter");                //pixel lifter
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        telemetry.setAutoClear(true);
+        telemetry.update();
+
+        waitForStart();
+
+        if (isStopRequested()) return;
+
         while (opModeIsActive()) {
 
             if (gamepad1.x) {
                 if (gamepad1.left_bumper) {
-                    driveRobot(step1, 0.0, -0.5);           //drive right
+                    driveRobot(step1, 0.0, 1.0, frontLeft, backLeft, frontRight, backRight);           //drive right
                 } else {
-                    driveRobot(step1, 0.0, 0.5);           //drive right
+                    driveRobot(step1, 0.0, -1.0, frontLeft, backLeft, frontRight, backRight);           //drive right
                 }
             }
             if (gamepad1.y) {
                 if (gamepad1.left_bumper) {
-                    driveRobot(step2, -0.5, 0.0);           //drive backward
+                    driveRobot(step2, 1.0, 0.0 , frontLeft, backLeft, frontRight, backRight);           //drive backward
                 } else {
-                    driveRobot(step2, 0.5, 0.0);           //drive backward
+                    driveRobot(step2, -1.0, 0.0, frontLeft, backLeft, frontRight, backRight);           //drive backward
                 }
             }
 
             if (gamepad1.dpad_left) {
-                raisePixelArm();    //deliver PIXEL (raise PIXEL arm)
+                raisePixelArm(lifterMotor);    //deliver PIXEL (raise PIXEL arm)
                 sleep(3000);    //sleep for 3 seconds to let the pixels fall into place
             }
 
             if (gamepad1.dpad_right) {
-                resetPixelArm();    //lower PIXEL arm
+                resetPixelArm(lifterMotor);    //lower PIXEL arm
                 sleep(1000);    //sleep for 3 seconds to let the pixels fall into place
             }
 
             if (gamepad1.b) {
                 if (gamepad1.left_bumper) {
-                    driveRobot(step3, 0.5, 0.0);          //drive forward
+                    driveRobot(step3, -1.0, 0.0, frontLeft, backLeft, frontRight, backRight);          //drive forward
                 } else {
-                    driveRobot(step3, -0.5, 0.0);          //drive forward
+                    driveRobot(step3, 1.0, 0.0, frontLeft, backLeft, frontRight, backRight);          //drive forward
                 }
 
                 if (gamepad1.a) {
                     if (gamepad1.left_bumper) {
-                        driveRobot(step4, 0.0, 0.5);          //drive left
+                        driveRobot(step4, 0.0, 1.0, frontLeft, backLeft, frontRight, backRight);          //drive left
                     } else {
-                        driveRobot(step4, 0.0, -0.5);          //drive left
+                        driveRobot(step4, 0.0, -1.0, frontLeft, backLeft, frontRight, backRight);          //drive left
                     }
 
                 }
                 if (gamepad1.dpad_down) {
                     if (gamepad1.left_bumper) {
-                        driveRobot(step5, -0.5, 0.0);           //drive backward
+                        driveRobot(step5, -1.0, 0.0, frontLeft, backLeft, frontRight, backRight);           //drive backward
                     } else {
-                        driveRobot(step5, 0.5, 0.0);           //drive backward
+                        driveRobot(step5, -1.0, 0.0, frontLeft, backLeft, frontRight, backRight);           //drive backward
                     }
                 }
 
@@ -87,15 +113,7 @@ public class testingAutoPixel extends LinearOpMode {
         }
     }
 
-    private void driveRobot(int distance, double leftStickY, double leftStickX) {
-
-        DcMotor frontLeft = hardwareMap.dcMotor.get("bl");
-        DcMotor backLeft = hardwareMap.dcMotor.get("fl");
-        DcMotor frontRight = hardwareMap.dcMotor.get("fr");
-        DcMotor backRight = hardwareMap.dcMotor.get("br");
-
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+    private void driveRobot(int distance, double leftStickY, double leftStickX, DcMotor frontLeft, DcMotor backLeft, DcMotor frontRight, DcMotor backRight) {
 
         int robotStartPosition = 0;
         boolean startChecked = false;
@@ -104,10 +122,6 @@ public class testingAutoPixel extends LinearOpMode {
         telemetry.setAutoClear(true);
         telemetry.update();
         float driveSpeed = 0.5f;
-
-        waitForStart();
-
-        if (isStopRequested()) return;
 
         //NOTE: 7000 is roughly 6 feet
         //NOTE: 3000 was roughly 2.5 feet
@@ -145,16 +159,9 @@ public class testingAutoPixel extends LinearOpMode {
 
         }
     }
+/*
 
     private void turnRobot(double rightStickX) {
-
-        DcMotor frontLeft = hardwareMap.dcMotor.get("bl");
-        DcMotor backLeft = hardwareMap.dcMotor.get("fl");
-        DcMotor frontRight = hardwareMap.dcMotor.get("fr");
-        DcMotor backRight = hardwareMap.dcMotor.get("br");
-
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         int robotStartPosition = 0;
         boolean startChecked = false;
@@ -207,9 +214,9 @@ public class testingAutoPixel extends LinearOpMode {
             telemetry.update();
         }
     }
+*/
 
-    private void raisePixelArm() {
-        DcMotor lifterMotor = hardwareMap.dcMotor.get("lifter");                //pixel lifter
+    private void raisePixelArm(DcMotor lifterMotor) {
         float lifterLowerMotorPower = 0;        //gamepad2.right_trigger;
         float lifterRaiseMotorPower = 0.5F;        //gamepad2.left_trigger;
 
@@ -238,8 +245,7 @@ public class testingAutoPixel extends LinearOpMode {
         }
     }
 
-    public void resetPixelArm() {
-        DcMotor lifterMotor = hardwareMap.dcMotor.get("lifter");                //pixel lifter
+    public void resetPixelArm(DcMotor lifterMotor) {
         float lifterLowerMotorPower = 0.5F;        //gamepad2.right_trigger;
         float lifterRaiseMotorPower = 0;        //gamepad2.left_trigger;
 
