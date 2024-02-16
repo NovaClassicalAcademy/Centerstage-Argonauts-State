@@ -12,7 +12,7 @@ public class PixelLifterB {
     int POSITION_FLOOR = 0;
     int POSITION_HOVER = 155;
     int POSITION_CARRY = 588;
-    int POSITION_DUMP = 1600;//was 1639
+    int POSITION_DUMP = 1750;//was 1639
     double INTAKE_ACQUIRE_SPEED = -.8;
     double INTAKE_REJECT_SPEED = .4;
 
@@ -40,7 +40,7 @@ public class PixelLifterB {
     }
 
     public void moveToFloor() {
-        goToTarget(mLiftMotor, POSITION_FLOOR, 700);
+        goToTarget(mLiftMotor, POSITION_FLOOR, 1000);
 
     }
 

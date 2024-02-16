@@ -157,6 +157,7 @@ public class RedBackstagePixelDrop extends LinearOpMode {
         lifterMotor = hardwareMap.get(DcMotorEx.class, "lifter");
         pixLift = new PixelLifterB(lifterMotor,intakeMotor,.3);
 
+
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -215,7 +216,7 @@ public class RedBackstagePixelDrop extends LinearOpMode {
           // Stop 4 secs
         //sleep(4000);
           //Drive toward back drop
-       driveStraight(DRIVE_SPEED, -37.5, 90.0);
+       driveStraight(DRIVE_SPEED, -38.5, 90.0);
           //Drop pixel onto back drop
         pixLift.dumpPixel();
         sleep(3000);

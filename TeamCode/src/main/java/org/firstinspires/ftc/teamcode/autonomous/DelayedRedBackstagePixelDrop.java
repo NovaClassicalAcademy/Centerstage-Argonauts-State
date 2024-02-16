@@ -33,6 +33,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -40,6 +41,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.PixelLifterB;
 
 /*
  *  This OpMode illustrates the concept of driving an autonomous path based on Gyro (IMU) heading and encoder counts.
@@ -136,7 +138,10 @@ public class DelayedRedBackstagePixelDrop extends LinearOpMode {
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable
 
+    DcMotor intakeMotor = null;
+    DcMotorEx lifterMotor = null;
 
+    PixelLifterB pixLift = null;
     @Override
     public void runOpMode() {
 
@@ -145,6 +150,11 @@ public class DelayedRedBackstagePixelDrop extends LinearOpMode {
         backLeftMotor = hardwareMap.get(DcMotor.class, "bl");
         frontRightMotor = hardwareMap.get(DcMotor.class, "fr");
         backRightMotor = hardwareMap.get(DcMotor.class, "br");
+        intakeMotor = hardwareMap.dcMotor.get("intake_motor");          //pixel intake
+        //lifterMotor = hardwareMap.dcMotor.get("lifter");  //pixel lifter
+        lifterMotor = hardwareMap.get(DcMotorEx.class, "lifter");
+        pixLift = new PixelLifterB(lifterMotor,intakeMotor,.3);
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -193,18 +203,24 @@ public class DelayedRedBackstagePixelDrop extends LinearOpMode {
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
-
-        sleep(20000);
+        sleep(11000);
+         //*** RAISED DRIVE SPEED UP TO 0.8 AND TURN SPEED TO 0.4
+        pixLift.moveToHover();
+        sleep(1000);
         driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
         //commenting out to see why bot is swerving
       //Rotate counterclockewise 90
        turnToHeading( TURN_SPEED, 90.0);
           // Stop 4 secs
-        sleep(4000);
+        //sleep(4000);
           //Drive toward back drop
-       driveStraight(DRIVE_SPEED, -45.0, 90.0);
+       driveStraight(DRIVE_SPEED, -38.5, 90.0);
           //Drop pixel onto back drop
-
+        pixLift.dumpPixel();
+        sleep(3000);
+        pixLift.moveToFloor();
+        //sleep(3000);
+        //pixLift.rejectOnePixel(1);
           //slip left to park( how do i go left?)
         // driveStraight(DRIVE_SPEED, 16.0, 180.0);
           //back into park
@@ -441,8 +457,10 @@ public class DelayedRedBackstagePixelDrop extends LinearOpMode {
             telemetry.addData("Motion", "Drive Straight");
             telemetry.addData("Target Pos L:R",  "%7d:%7d",      leftTarget,  rightTarget);
             telemetry.addData("Actual Pos L:R",  "%7d:%7d",      frontLeftMotor.getCurrentPosition(),
+
                     frontRightMotor.getCurrentPosition());
         } else {
+
             telemetry.addData("Motion", "Turning");
         }
 
