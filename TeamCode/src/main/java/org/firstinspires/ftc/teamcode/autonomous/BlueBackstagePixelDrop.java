@@ -218,6 +218,17 @@ public class BlueBackstagePixelDrop extends LinearOpMode {
           //Drop pixel onto back drop
         pixLift.dumpPixel();
         sleep(3000);
+
+        //Anneka start
+        pixLift.moveToHover();
+        sleep(1000);
+        driveStraight(DRIVE_SPEED, 5, -90.0);
+        turnToHeading( TURN_SPEED, 0);
+        driveStraight(DRIVE_SPEED, -20.0, 0.0);    // Drive Forward 24"
+        turnToHeading( TURN_SPEED, -90.0);
+        driveStraight(DRIVE_SPEED, -12, -90.0);
+        //Anneka end
+
         pixLift.moveToFloor();
         //sleep(3000);
         //pixLift.rejectOnePixel(1);

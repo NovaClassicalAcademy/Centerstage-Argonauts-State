@@ -31,7 +31,7 @@ public class argo_fc extends argonautRobot {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        if(gamepad1.b) {
+        if(gamepad1.right_bumper) {
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
